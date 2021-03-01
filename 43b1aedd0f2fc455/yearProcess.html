@@ -1,0 +1,23 @@
+<script>
+    const scores = {
+        "1-6": 0,
+        "7-12": 0,
+        standard: 1750
+    }
+</script>
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
+<div id="process-box" style="width: max-content;margin: auto;">
+    <el-progress type="circle" :percentage="percentage"></el-progress>
+</div>
+<script src="//cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
+<script src="https://unpkg.com/element-ui@2.14.1/lib/index.js"></script>
+<script>
+    const current = scores['1-6'] + scores['7-12'];
+    new Vue({
+        el: '#process-box',
+        data: {
+            customColor: '#409eff',
+            percentage: (current / scores.standard).toFixed(2)
+        }
+    });
+</script>

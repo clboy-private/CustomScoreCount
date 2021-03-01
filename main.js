@@ -44,7 +44,18 @@ const DATACENTER = {
         "生物": { noPass: -0.5, pass: 0.1, total: 50, reward: 0.1 },
         "政治": { noPass: -0.5, pass: 0.1, total: 50, reward: 0.1 },
         "总分": { noPass: -0.8, pass: 0.05, total: 650, reward: 0.02 },
+    },
+    weekScore: {
+        study: 10,
+        play: -20,
+        chat: -10
+    },
+    ignoreTime: {
+        dayPlay: 0.2,
+        weekPlay: 8,
+        chatScale: 0.2
     }
+
 }
 const Calculations = {
     P: {
@@ -123,9 +134,35 @@ const NaNToZero = function (text) {
     return Number(text);
 }
 const hookFn = function () {
-    let main_table = document.querySelector('#main-tb')
-    if (!main_table) return;
-    let trs = main_table.querySelectorAll('tbody>tr');
+    let total = 0;
+    let dayTable = document.querySelector('#day-tb');
+
+    if (dayTable) {
+        formatDayLine(dayTable);
+        total += countScore(dayTable);
+    };
+
+    let phoneWeekTable = document.querySelector('#phone-week-tb');
+
+    if (phoneWeekTable) {
+        formatPhoneWeekLine(phoneWeekTable);
+        total += countScore(phoneWeekTable);
+    }
+
+    let quarterScore = document.querySelector('#quarter-score');
+    if (quarterScore) {
+        quarterScore.innerHTML = '当前分值：' + total;
+    }
+}
+
+const lineBg = function (type, category) {
+    switch (type) {
+        case 'P': return DATACENTER.bgColor.P[category];
+        case 'X': return DATACENTER.bgColor.X;
+    }
+}
+const formatDayLine = function (dayTableDom) {
+    let trs = dayTableDom.querySelectorAll('tbody>tr');
 
     for (let i = 0; i < trs.length; i++) {
         let tds = trs[i].querySelectorAll('td');
@@ -155,28 +192,44 @@ const hookFn = function () {
             trs[i].style.backgroundColor = lineBg(type, category);
         }
     }
+}
 
-    //计算总分
-    let scores = document.querySelectorAll('#main-tb tbody>tr>td:last-child');
-    console.log(scores);
-    scores = Array.from(scores);
-    let total = scores.reduce((total, val) => { 
-        console.log(total);
-        return total + Number(val.innerHTML)
-     }, 0)
-    console.log(total);
-    let totalLine = document.createElement('tr');
-    totalLine.innerHTML = '<td colSpan="9" style="text-align:center;font-size:24px"><b>总计：' + total + '</b></td>';
-    main_table.querySelector('tbody').append(totalLine);
-    let quarterScore = document.querySelector('#quarter-score');
-    if (quarterScore) {
-        quarterScore.innerHTML = '当前分值：' + total;
+const formatPhoneWeekLine = function (phoneWeekTableDom) {
+    let trs = phoneWeekTableDom.querySelectorAll('tbody>tr');
+    for (let i = 0; i < trs.length; i++) {
+        let tds = trs[i].querySelectorAll('td');
+        let totalTime = Number(tds[4].innerHTML.trim());
+        //学习
+        let studyScore = weekCellConvert(tds[1], DATACENTER.weekScore.study, totalTime, 0);
+        //娱乐
+        let playScore = weekCellConvert(tds[2], DATACENTER.weekScore.play, totalTime, DATACENTER.ignoreTime.weekPlay);
+        //社交
+        let chatScore = weekCellConvert(tds[3], DATACENTER.weekScore.chat, totalTime, DATACENTER.ignoreTime.chatScale * 10 * totalTime / 10);
+        //得分
+        let totalScoreTd = tds[tds.length - 1];
+        totalScoreTd.innerHTML = studyScore + playScore + chatScore;
     }
 }
 
-const lineBg = function (type, category) {
-    switch (type) {
-        case 'P': return DATACENTER.bgColor.P[category];
-        case 'X': return DATACENTER.bgColor.X;
+const countScore = function (tableDom) {
+    let scores = tableDom.querySelectorAll('tbody>tr>td:last-child');
+    scores = Array.from(scores);
+    let total = scores.reduce((total, val) => {
+        return total + Number(val.innerHTML)
+    }, 0)
+    let totalLine = document.createElement('tr');
+    totalLine.innerHTML = '<td colSpan="9" style="text-align:center;font-size:24px"><b>总计：' + total + '</b></td>';
+    tableDom.querySelector('tbody').append(totalLine);
+    return total;
+}
+
+const weekCellConvert = function (cellDom, scale, totalTime, ignoreTime) {
+    let value = Number(cellDom.innerHTML.trim()) - ignoreTime;
+    console.log(ignoreTime);
+    let result = 0;
+    if (totalTime && value > 0) {
+        result = Math.floor(scale * value / totalTime);
     }
+    // cellDom.innerHTML = result;
+    return result;
 }

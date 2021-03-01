@@ -74,8 +74,19 @@
                     this.$message.error('输入非数字或非正数');
                     return;
                 }
-                if (this.type == 'P' && this.total < this.value) {
-                    this.$message.error('总时间要大于等于分类使用时间');
+                if (this.type == 'P') {
+                    if (this.total < this.value) {
+                        this.$message.error('总时间要大于等于分类使用时间');
+                        return;
+                    }
+                    if (this.total > 24 || this.value > 24) {
+                        this.$message.error('一天最多才24个小时！');
+                        return;
+                    }
+                }
+
+                if (this.type == 'E' && this.value > DATACENTER.EScore[this.category].total) {
+                    this.$message.error(this.category + '的总分数才' + DATACENTER.EScore[this.category].total + '分' + '，你能考' + this.value + '？');
                     return;
                 }
                 this.score = Calculations.getScore(this.type, this.category, this.value, this.total);
