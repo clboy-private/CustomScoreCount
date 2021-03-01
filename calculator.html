@@ -27,10 +27,11 @@
         </el-select>
     </div>
     <div class="form-item" v-if="type">
-        <el-input v-model="value" :placeholder="type=='P'?'请输入'+category+'小时数':'请输入该科目成绩'"></el-input>
+        <el-input type="number" v-model.number="value" :placeholder="type=='P'?'请输入'+category+'小时数':'请输入该科目成绩'">
+        </el-input>
     </div>
     <div class="form-item" v-if="type=='P'">
-        <el-input v-model="total" placeholder="请输入当天手机总使用小时数"></el-input>
+        <el-input type="number" v-model.number="total" placeholder="请输入当天手机总使用小时数"></el-input>
     </div>
     <div class="form-item">
         <el-button type="primary" :disabled="!verify" @click="showScore">计算得分</el-button>

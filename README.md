@@ -102,9 +102,3 @@
 | 2021-03-02 | C    |      |                      |                        | -10  |      | 买东西 | -10  |
 
 </div>
-
-
-
-## 分数计算器
-
-[calculator](calculator.html ':include')
