@@ -1,6 +1,6 @@
 #!/bin/bash
 git add .
-echo "输入提交信息:"
+echo -e "输入提交信息：\c"
 read msg
-git commit -m "更新${msg}",
+git commit -m "${msg}"
 git push
